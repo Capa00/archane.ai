@@ -1,0 +1,11 @@
+services:
+  agent:
+    image: ghcr.io/cheshire-cat-ai/core:latest
+    container_name: mauro
+    ports:
+      - 1865:80
+      - 5678:5678
+    volumes:
+      - ./static:/app/cat/static
+      - ./plugins:/app/cat/plugins
+      - ./mauro/data:/app/cat/data
