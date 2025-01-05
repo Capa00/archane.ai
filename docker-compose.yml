@@ -6,6 +6,6 @@ services:
       - 1865:80
       - 5678:5678
     volumes:
-      - ./static:/app/cat/static
-      - ./plugins:/app/cat/plugins
-      - ./mauro/data:/app/cat/data
+      - ./volumes/static:/app/cat/static
+      - ./volumes/plugins:/app/cat/plugins
+      - ./volumes/data:/app/cat/data
