@@ -1,11 +1,21 @@
 services:
-  agent:
-    image: ghcr.io/cheshire-cat-ai/core:latest
-    container_name: mauro
+#  agent:
+#    image: ghcr.io/cheshire-cat-ai/core:latest
+#    container_name: mauro
+#    ports:
+#      - 1865:80
+#      - 5678:5678
+#    volumes:
+#      - ./volumes/static:/app/cat/static
+#      - ./volumes/plugins:/app/cat/plugins
+#      - ./volumes/data:/app/cat/data
+  mongo:
+    image: mongo:latest
+    container_name: mongo
     ports:
-      - 1865:80
-      - 5678:5678
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
     volumes:
-      - ./volumes/static:/app/cat/static
-      - ./volumes/plugins:/app/cat/plugins
-      - ./volumes/data:/app/cat/data
+      - ./volumes/mongodb:/data/db

@@ -37,6 +37,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
+    "django_json_widget",
+
+    "state",
+
 ]
 
 MIDDLEWARE = [
@@ -74,9 +79,16 @@ WSGI_APPLICATION = "archane.wsgi.application"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'djongo',
+        'NAME': 'archane',
+        'CLIENT': {
+            'host': 'mongodb://localhost',
+            'port': 27017,
+            'username': 'admin',
+            'password': 'password',
+            'authSource': 'admin',
+        }
     }
 }
 
