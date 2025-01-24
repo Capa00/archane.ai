@@ -8,7 +8,9 @@ class TargetAudienceForm(forms.ModelForm):
         model = TargetAudience
         fields = '__all__'
         widgets = {
-            'age_range': JSONEditorWidget(),  # Usa il widget JSON per il campo age_range
+            'age_range': JSONEditorWidget(),
+            'interests': JSONEditorWidget(),
+            'locations': JSONEditorWidget(),
         }
 
 @admin.register(TargetAudience)

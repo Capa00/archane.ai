@@ -1,3 +1,4 @@
+from django.db.models import JSONField
 from djongo import models
 
 class Interest(models.Model):
@@ -7,15 +8,9 @@ class Interest(models.Model):
         abstract = True
 
 class TargetAudience(models.Model):
-    age_range = models.JSONField()
-    interests = models.ArrayField(
-        model_container=Interest,
-        blank=True,
-    )
-    locations = models.ArrayField(
-        model_container=Interest,
-        blank=True,
-    )
+    age_range = JSONField(null=True, blank=True, default={})
+    interests = JSONField(null=True, blank=True, default=[])
+    locations = JSONField(null=True, blank=True, default=[])
 
     class Meta:
          abstract = False
