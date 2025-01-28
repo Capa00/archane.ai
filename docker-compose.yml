@@ -3,33 +3,25 @@ version: '3.9'
 services:
   # Servizio per il container Django
   web:
-    build: .
+    build: src/.
     command: >
       sh -c "
         python manage.py migrate && 
         python manage.py collectstatic --noinput --clear && 
         gunicorn project.wsgi:application"
-    volumes:
-      - .:/app
     ports:
       - "8000:8000"
     depends_on:
       - db
-    environment:
-      - DEBUG=True
-      - DATABASE_URL=postgres://django:password@db:5432/django_db
+    env_file:
+      - docker/environments/django.env
 
   # Servizio per PostgreSQL
   db:
     image: postgres:14
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: django
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: django_db
+      - ./docker/volumes/postgresql/data:/var/lib/postgresql/data
+    env_file:
+      - docker/environments/postgres.env
     ports:
       - "5432:5432"
-
-volumes:
-  postgres_data:
