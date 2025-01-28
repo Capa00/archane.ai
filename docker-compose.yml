@@ -1,11 +1,35 @@
+version: '3.9'
+
 services:
-  agent:
-    image: ghcr.io/cheshire-cat-ai/core:latest
-    container_name: mauro
-    ports:
-      - 1865:80
-      - 5678:5678
+  # Servizio per il container Django
+  web:
+    build: .
+    command: >
+      sh -c "
+        python manage.py migrate && 
+        python manage.py collectstatic --noinput --clear && 
+        gunicorn project.wsgi:application"
     volumes:
-      - ./volumes/static:/app/cat/static
-      - ./volumes/plugins:/app/cat/plugins
-      - ./volumes/data:/app/cat/data
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DEBUG=True
+      - DATABASE_URL=postgres://django:password@db:5432/django_db
+
+  # Servizio per PostgreSQL
+  db:
+    image: postgres:14
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: django
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: django_db
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:

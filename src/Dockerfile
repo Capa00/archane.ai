@@ -1,20 +1,19 @@
-# Use an official Python runtime based on Debian 12 "bookworm" as a parent image.
+# Usa un'immagine ufficiale di Python basata su Debian 12 "bookworm".
 FROM python:3.12-slim-bookworm
 
-# Add user that will be used in the container.
+# Aggiungi un utente che sarà utilizzato nel container.
 RUN useradd django
 
-# Port used by this container to serve HTTP.
+# Porta usata da questo container per servire HTTP.
 EXPOSE 8000
 
-# Set environment variables.
-# 1. Force Python stdout and stderr streams to be unbuffered.
-# 2. Set PORT variable that is used by Gunicorn. This should match "EXPOSE"
-#    command.
+# Imposta variabili di ambiente.
+# 1. Forza Python per non fare buffering su stdout e stderr.
+# 2. Imposta la variabile PORT che viene utilizzata da Gunicorn. Dovrebbe corrispondere alla porta definita con EXPOSE.
 ENV PYTHONUNBUFFERED=1 \
     PORT=8000
 
-# Install system packages required by Wagtail and Django.
+# Installa pacchetti di sistema necessari da Wagtail e Django.
 RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-recommends \
     build-essential \
     libpq-dev \
@@ -24,37 +23,29 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
     libwebp-dev \
  && rm -rf /var/lib/apt/lists/*
 
-# Install the application server.
+# Installa il server applicativo (Gunicorn).
 RUN pip install "gunicorn==20.0.4"
 
-# Install the project requirements.
+# Installa le dipendenze del progetto.
 COPY requirements.txt /
 RUN pip install -r /requirements.txt
 
-# Use /app folder as a directory where the source code is stored.
+# Usa la cartella /app come directory dove risiede il codice sorgente.
 WORKDIR /app
 
-# Set this directory to be owned by the "wagtail" user. This Wagtail project
-# uses SQLite, the folder needs to be owned by the user that
-# will be writing to the database file.
+# Imposta questa cartella come di proprietà dell'utente "django".
 RUN chown django:django /app
 
-# Copy the source code of the project into the container.
+# Copia il codice sorgente del progetto nel container.
 COPY --chown=django:django . .
 
-# Use user "django" to run the build commands below and the server itself.
+# Usa l'utente "django" per eseguire i comandi di build e il server.
 USER django
 
-# Collect static files.
+# Colleziona i file statici.
 RUN python manage.py collectstatic --noinput --clear
 
-# Runtime command that executes when "docker run" is called, it does the
-# following:
-#   1. Migrate the database.
-#   2. Start the application server.
-# WARNING:
-#   Migrating database at the same time as starting the server IS NOT THE BEST
-#   PRACTICE. The database should be migrated manually or using the release
-#   phase facilities of your hosting platform. This is used only so the
-#   Wagtail instance can be started with a simple "docker run" command.
+# Comando di runtime che viene eseguito quando viene chiamato "docker run".
+# 1. Esegui le migrazioni del database.
+# 2. Avvia il server dell'applicazione.
 CMD set -xe; gunicorn project.wsgi:application
