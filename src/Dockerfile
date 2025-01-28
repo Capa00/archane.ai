@@ -2,7 +2,7 @@
 FROM python:3.12-slim-bookworm
 
 # Add user that will be used in the container.
-RUN useradd wagtail
+RUN useradd django
 
 # Port used by this container to serve HTTP.
 EXPOSE 8000
@@ -37,13 +37,13 @@ WORKDIR /app
 # Set this directory to be owned by the "wagtail" user. This Wagtail project
 # uses SQLite, the folder needs to be owned by the user that
 # will be writing to the database file.
-RUN chown wagtail:wagtail /app
+RUN chown django:django /app
 
 # Copy the source code of the project into the container.
-COPY --chown=wagtail:wagtail . .
+COPY --chown=django:django . .
 
-# Use user "wagtail" to run the build commands below and the server itself.
-USER wagtail
+# Use user "django" to run the build commands below and the server itself.
+USER django
 
 # Collect static files.
 RUN python manage.py collectstatic --noinput --clear
@@ -57,4 +57,4 @@ RUN python manage.py collectstatic --noinput --clear
 #   PRACTICE. The database should be migrated manually or using the release
 #   phase facilities of your hosting platform. This is used only so the
 #   Wagtail instance can be started with a simple "docker run" command.
-CMD set -xe; python manage.py migrate --noinput; gunicorn project.wsgi:application
+CMD set -xe; gunicorn project.wsgi:application
