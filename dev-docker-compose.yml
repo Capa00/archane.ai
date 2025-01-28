@@ -6,8 +6,8 @@ services:
     volumes:
       - ./docker/volumes/postgresql/data:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: django
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: archane
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
     ports:
       - "5432:5432"
