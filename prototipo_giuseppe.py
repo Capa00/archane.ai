@@ -1,6 +1,6 @@
 import threading
 import requests
-
+import json
 
 class PsychologistAgent:
     def __init__(self, name):
