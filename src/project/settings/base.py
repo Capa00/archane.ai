@@ -30,6 +30,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
+    'mdeditor',
+    'django_json_widget',
+
+    "agents",
+    "goal_generation",
 ]
 
 MIDDLEWARE = [
@@ -142,5 +148,11 @@ STORAGES = {
     "staticfiles": {
         "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
     },
+}
+
+MDEDITOR_CONFIGS = {
+    'default': {
+        'language': 'en',  # Forza la lingua inglese
+    }
 }
 
