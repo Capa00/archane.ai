@@ -1,0 +1,179 @@
+{# myapp/templates/widgets/json_wizard_widget.html #}
+<div id="{{ field_name }}_wizard" class="json-wizard" data-config-id="{{ config_id }}">
+    <!-- Input nascosto per memorizzare il JSON finale -->
+    <input type="hidden" name="{{ field_name }}" value='{{ field_value|escapejs }}'>
+    <div class="wizard-container">
+        <div id="{{ field_name }}_step_container">
+            <!-- Qui verrà iniettato il form relativo allo step -->
+        </div>
+        <div class="wizard-navigation">
+            <button type="button" id="{{ field_name }}_prev_btn" onclick="prevStep('{{ field_name }}')">Precedente</button>
+            <button type="button" id="{{ field_name }}_next_btn" onclick="nextStep('{{ field_name }}')">Avanti</button>
+            <button type="button" id="{{ field_name }}_submit_btn" style="display:none;" onclick="submitWizard('{{ field_name }}')">Salva</button>
+        </div>
+    </div>
+</div>
+
+<script>
+/**
+ * Inizializza il wizard per il campo con nome "fieldName".
+ * La configurazione viene identificata tramite l'attributo data-config-id.
+ */
+function initJsonWizard(fieldName) {
+    window.jsonWizards = window.jsonWizards || {};
+    var wizardEl = document.getElementById(fieldName + "_wizard");
+    var configId = wizardEl.getAttribute("data-config-id");
+    window.jsonWizards[fieldName] = {
+        configId: configId,
+        currentStep: null,
+        data: {},
+        stepsHistory: []
+    };
+    // Carica lo step iniziale; se non viene passato "step", la view utilizzerà l'iniziale definita in config
+    loadStep(fieldName, null);
+}
+
+/**
+ * Carica il form per lo step corrente tramite AJAX.
+ * Se stepKey è null, la view utilizzerà lo step iniziale.
+ */
+function loadStep(fieldName, stepKey) {
+    var wizard = window.jsonWizards[fieldName];
+    if (!stepKey) {
+        // Se non viene passato uno step, usiamo quello attualmente impostato
+        stepKey = wizard.currentStep;
+    } else if (wizard.currentStep && wizard.currentStep !== stepKey) {
+        wizard.stepsHistory.push(wizard.currentStep);
+    }
+    wizard.currentStep = stepKey;
+    var params = "config_id=" + encodeURIComponent(wizard.configId) +
+                 "&step=" + encodeURIComponent(stepKey) +
+                 "&prefix=" + fieldName;
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/wizard/get_step_form/?" + params, true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            var container = document.getElementById(fieldName + "_step_container");
+            container.innerHTML = xhr.responseText;
+            updateNavigationButtons(fieldName);
+        }
+    };
+    xhr.send();
+}
+/**
+ * Aggiorna la visibilità dei pulsanti di navigazione.
+ * (Qui potresti personalizzare la logica in base allo step corrente.)
+ */
+function updateNavigationButtons(fieldName) {
+    // Esempio: se il form attuale è l'ultimo step, mostra il pulsante "Salva"
+    // La logica esatta dipende dalla tua implementazione.
+}
+
+/**
+ * Gestisce il passaggio allo step successivo: invia i dati del form via AJAX per la validazione.
+ */
+function nextStep(fieldName) {
+    var wizard = window.jsonWizards[fieldName];
+    var formData = new FormData();
+    var form = document.querySelector("#" + fieldName + "_step_container");
+    var elements = form.querySelectorAll('input, textarea, select');
+    elements.forEach(function(element) {
+        // Verifica se l'elemento ha un attributo name (necessario per FormData)
+        if (element.name) {
+            // Per gli input tipo checkbox o radio, usa il loro valore solo se selezionato
+            if ((element.type === 'checkbox' || element.type === 'radio') && !element.checked) {
+              return;
+            }
+
+            // Aggiungi il valore al FormData
+            formData.append(element.name, element.value);
+        }
+    });
+    formData.append("config_id", wizard.configId);
+    formData.append("step", wizard.currentStep);
+    formData.append("prefix", fieldName);
+    var csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]');
+    if (csrfToken) {
+      formData.append(csrfToken.name, csrfToken.value);
+    }
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/wizard/validate_step/?config_id=" + encodeURIComponent(wizard.configId) + "&step=" + encodeURIComponent(wizard.currentStep) + "&prefix=" + fieldName, true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                var resp = JSON.parse(xhr.responseText);
+                if (resp.valid) {
+                    // Salva i dati validati
+                    wizard.data[wizard.currentStep] = resp.cleaned_data;
+                    // Determina il prossimo step (la view restituisce next_step)
+                    var nextStepKey = resp.next_step;
+                    if (nextStepKey) {
+                        loadStep(fieldName, nextStepKey);
+                    }
+                } else {
+                    displayFormErrors(form, resp.errors);
+                }
+            } else {
+                alert("Errore nella validazione dello step.");
+            }
+        }
+    };
+    xhr.send(formData);
+}
+
+/**
+ * Torna allo step precedente, se presente.
+ */
+function prevStep(fieldName) {
+    var wizard = window.jsonWizards[fieldName];
+    if (wizard.stepsHistory && wizard.stepsHistory.length > 0) {
+        var previousStep = wizard.stepsHistory.pop();
+        loadStep(fieldName, previousStep);
+    }
+}
+
+/**
+ * Alla fine del wizard, aggrega i dati e li inserisce nell'input nascosto,
+ * quindi invia il form padre.
+ */
+function submitWizard(fieldName) {
+    var wizard = window.jsonWizards[fieldName];
+    var hiddenInput = document.querySelector("#" + fieldName + "_wizard input[type='hidden']");
+    hiddenInput.value = JSON.stringify(wizard.data);
+    var parentForm = hiddenInput.closest("form");
+    if (parentForm) {
+        parentForm.submit();
+    }
+}
+
+/**
+ * Visualizza gli errori di validazione sotto i relativi campi.
+ */
+function displayFormErrors(form, errors) {
+    var errorElements = form.querySelectorAll(".errorlist");
+    errorElements.forEach(function(el) { el.remove(); });
+    for (var field in errors) {
+        var input = form.querySelector("[name='" + field + "']");
+        if (input) {
+            var ul = document.createElement("ul");
+            ul.className = "errorlist";
+            errors[field].forEach(function(err) {
+                var li = document.createElement("li");
+                li.textContent = err;
+                ul.appendChild(li);
+            });
+            input.parentNode.insertBefore(ul, input.nextSibling);
+        }
+    }
+}
+
+/* Inizializza tutti i wizard presenti nella pagina */
+document.addEventListener("DOMContentLoaded", function(){
+    var wizards = document.querySelectorAll(".json-wizard");
+    wizards.forEach(function(wizardEl) {
+        var fieldName = wizardEl.getAttribute("id").replace("_wizard", "");
+        initJsonWizard(fieldName);
+    });
+});
+</script>

@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'mdeditor',
     'django_json_widget',
 
+    "wizard_form_widget",
     "agents",
     "goal_generation",
 ]

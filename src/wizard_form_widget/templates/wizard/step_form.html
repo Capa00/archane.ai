@@ -1,0 +1,5 @@
+{# myapp/templates/wizard/step_form.html #}
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+</form>
