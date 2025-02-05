@@ -2,3 +2,7 @@ tweepy>=4.14.0
 Django>=5.1.5
 psycopg2>=2.9.10
 django-mdeditor>=0.1.20
+openai>=1.61.1
+tiktoken>=0.8.0
+pillow>=11.1.0
+django-jsonform>=2.23.2
