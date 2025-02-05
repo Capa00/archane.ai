@@ -1,4 +1,7 @@
+import json
+
 from django.db import models
+from django.template import Template, Context
 from django_jsonform.models.fields import JSONField
 
 from agents.abstract_module import AbstractModule
@@ -76,4 +79,52 @@ class GoalGeneration(AbstractModule):
         "required": ["platform", "date", "users", "engagement", "content", "revenue", "growth"]
     }
 
+    OUTPUT_SCHEMA = {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "Goal Setting Schema",
+        "description": "Schema per definire obiettivi e sotto-obiettivi con relative descrizioni.",
+        "type": "object",
+        "properties": {
+            "goal": {
+                "type": "string",
+                "description": "Titolo dell'obiettivo principale."
+            },
+            "description": {
+                "type": "string",
+                "description": "Breve spiegazione del motivo per cui questo obiettivo è rilevante, basata su metriche fornite."
+            },
+            "subgoals": {
+                "type": "array",
+                "description": "Elenco dei sotto-obiettivi legati all'obiettivo principale.",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "subgoal": {
+                            "type": "string",
+                            "description": "Titolo del sotto-obiettivo."
+                        },
+                        "description": {
+                            "type": "string",
+                            "description": "Breve descrizione del sotto-obiettivo."
+                        }
+                    },
+                }
+            }
+        },
+    }
+
     data = JSONField(schema=DATA_SCHEMA, null=True, blank=True)
+    output = JSONField(schema=OUTPUT_SCHEMA, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.agent.name}"
+
+    def llm(self, message=None):
+        template = Template(self.system_prompt)
+        context = Context({
+            "data": json.dumps(self.data),
+            "output": json.dumps(self.output),
+        })
+        rendered_string = template.render(context)
+
+        print(rendered_string)

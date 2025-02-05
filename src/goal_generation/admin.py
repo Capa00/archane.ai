@@ -5,3 +5,22 @@ from .models import GoalGeneration
 class GoalGenerationAdmin(admin.ModelAdmin):
     list_display = ("name",)  # Personalizza le colonne visibili nella lista admin
     search_fields = ("name",)  # Aggiunge la ricerca nei campi
+
+    fieldsets = (
+        ("Configurazione Agente", {
+            "fields": ("agent",),
+            #"classes": ("collapse",),
+        }),
+        ("Informazioni Generali", {
+            "fields": ("name", "system_prompt"),
+            #"classes": ("collapse",),  # Rende la sezione collassabile
+        }),
+        ("Module state", {
+            "fields": ("data",),
+            "classes": ("collapse",),
+        }),
+        ("Module output", {
+            "fields": ("output",),
+            "classes": ("collapse",),
+        }),
+    )
