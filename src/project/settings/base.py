@@ -37,6 +37,7 @@ INSTALLED_APPS = [
 
     "agents",
     "goal_generation",
+    "cognitive_controller",
 ]
 
 MIDDLEWARE = [

@@ -1,11 +1,19 @@
 from django.db import models
-from mdeditor.fields import MDTextField
+from django_jsonform.models.fields import JSONField
 
 
-class AbstractModule(models.Model):
+class Module(models.Model):
     name = models.CharField(max_length=50)
-    system_prompt = MDTextField(null=True, blank=True)
-    agent = models.ForeignKey("agents.Agent", on_delete=models.SET_NULL, null=True)
+    agent = models.ForeignKey("agents.Agent", on_delete=models.SET_NULL, null=True, related_name="modules")
 
-    class Meta:
-        abstract = True
+    data_schema = models.JSONField(null=True, blank=True, default=dict)
+    data = JSONField(null=True, blank=True)
+
+    output_schema = models.JSONField(null=True, blank=True, default=dict)
+    output = JSONField(null=True, blank=True)
+
+    def get_data_schema(self):
+        return self.data_schema or {"type": "object", "properties": {}}
+
+    def get_output_schema(self):
+        return self.output_schema or {"type": "object", "properties": {}}

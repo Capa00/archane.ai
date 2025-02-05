@@ -6,3 +6,5 @@ openai>=1.61.1
 tiktoken>=0.8.0
 pillow>=11.1.0
 django-jsonform>=2.23.2
+django-mdeditor>=0.1.20
+django-json-widget>=2.0.1

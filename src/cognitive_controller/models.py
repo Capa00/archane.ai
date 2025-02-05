@@ -1,4 +1,8 @@
 from django.db import models
 
-# Create your models here.
+from agents.abstract_module import Module
 
+
+# Create your models here.
+class CognitiveController(Module):
+    ...

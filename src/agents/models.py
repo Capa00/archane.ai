@@ -1,6 +1,8 @@
 from django.db import models
 from django_jsonform.models.fields import JSONField
 
+from goal_generation.models import GoalGeneration
+
 
 # Create your models here.
 class Agent(models.Model):
@@ -135,6 +137,12 @@ class Agent(models.Model):
 
     name = models.CharField(max_length=50)
     settings = JSONField(schema=SETTINGS_SCHEMA, null=True, blank=True)
+
+    def get_state(self):
+        state = {}
+        for module in self.modules.all():
+            state[module.name] = module.output
+        return state
 
     def __str__(self):
         return f"Agent - {self.name}"
