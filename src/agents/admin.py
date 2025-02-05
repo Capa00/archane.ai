@@ -6,9 +6,7 @@ from agents.models import Agent
 from goal_generation.models import GoalGeneration
 
 class BaseAdmin(admin.ModelAdmin):
-    formfield_overrides = {
-        JSONField: {'widget': JSONEditorWidget},
-    }
+    ...
 
 class GoalGenerationInline(admin.StackedInline):  # Puoi usare anche StackedInline
     model = GoalGeneration

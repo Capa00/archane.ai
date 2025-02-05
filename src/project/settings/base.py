@@ -33,6 +33,7 @@ INSTALLED_APPS = [
 
     'mdeditor',
     'django_json_widget',
+    'django_jsonform',
 
     "agents",
     "goal_generation",
