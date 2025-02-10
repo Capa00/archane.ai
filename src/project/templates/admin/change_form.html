@@ -1,0 +1,25 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block object-tools-items %}
+    {{ block.super }}
+    {% if object_tools %}
+        {% for tool in object_tools %}
+            <li>
+                <a href="{{ tool.url }}"
+                   class="{{ tool.class }} {% if tool.wait %}ajax-tool{% endif %}"
+                   style="background: var(--button-bg); color: white;">
+                    {% if tool.icon %}
+                        <i class="fa {{ tool.icon }}"></i>
+                    {% endif %}
+                    {{ tool.label }}
+                </a>
+            </li>
+        {% endfor %}
+    {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script src="{% static 'js/admin_tools.js' %}"></script>
+{% endblock %}

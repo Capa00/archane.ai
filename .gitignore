@@ -285,3 +285,4 @@ docker/environments/*.env
 
 **/*_d3v.*
 **/*_d3v/**
+/src/static/
