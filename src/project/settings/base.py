@@ -34,10 +34,10 @@ INSTALLED_APPS = [
     'mdeditor',
     'django_json_widget',
     'django_jsonform',
+    'nested_admin',
 
     "agents",
-    "goal_generation",
-    "cognitive_controller",
+    "modules",
 ]
 
 MIDDLEWARE = [

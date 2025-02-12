@@ -3,7 +3,6 @@ from django_json_widget.widgets import JSONEditorWidget
 from django_jsonform.widgets import JSONFormWidget
 
 from agents.models import Agent
-from goal_generation.models import GoalGeneration
 
 class BaseAdmin(admin.ModelAdmin):
     ...
@@ -50,27 +49,9 @@ class ModuleInline(admin.StackedInline):
             kwargs["widget"] = JSONFormWidget(schema=schema)
         return super().formfield_for_dbfield(db_field, request, **kwargs)
 
-class GoalGenerationInline(ModuleInline):
-    model = GoalGeneration
-    fieldsets = (
-        ("Informazioni Generali", {
-            "fields": ("name", "system_prompt"),
-            "classes": ("collapse",),
-        }),
-        ("Data", {
-            "fields": ("data",),
-            "classes": ("collapse",),
-        }),
-        ("Last Output", {
-            "fields": ("output",),
-            "classes": ("collapse",),
-        }),
-    )
-
 class AgentAdmin(BaseAdmin):
     list_display = ("name",)
     search_fields = ("name",)
     list_filter = ("name",)
-    inlines = [GoalGenerationInline]
 
 admin.site.register(Agent, AgentAdmin)

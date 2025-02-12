@@ -1,9 +1,6 @@
 from django.db import models
 from django_jsonform.models.fields import JSONField
 
-from goal_generation.models import GoalGeneration
-
-
 # Create your models here.
 class Agent(models.Model):
     SETTINGS_SCHEMA = {
