@@ -76,7 +76,7 @@ class LLMOpenAILikeActionConfigForm(forms.Form):
                 }
             }
         },
-        "required": ["system_prompt", "data"],
+        "required": ["data"],
         "additionalProperties": False
     }
     prompt = MDTextFormField()
