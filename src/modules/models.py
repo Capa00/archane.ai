@@ -1,5 +1,4 @@
 import logging
-from importlib import import_module
 from typing import Any, Dict
 
 import jsonschema
@@ -66,7 +65,7 @@ class ModuleAction(models.Model):
     module: Module = models.ForeignKey(Module, on_delete=models.SET_NULL, related_name="module_actions", null=True)
     action: Action = models.ForeignKey(Action, on_delete=models.SET_NULL, related_name="module_actions", null=True)
     configs: dict = models.JSONField(_("Config"), default=dict, null=True, blank=True)
-    inputs: dict = models.JSONField(_("Input"), default=dict, null=True, blank=True)
+    #inputs: dict = models.JSONField(_("Input"), default=dict, null=True, blank=True)
 
     order: int = models.PositiveIntegerField(
         default=0,
@@ -75,13 +74,13 @@ class ModuleAction(models.Model):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        try:
-            action = self.action
-            if self.action:
-                jsonschema.validate(instance=self.inputs, schema=action.input_schema)
-        except (jsonschema.exceptions.ValidationError, Action.DoesNotExist) as e:
-            self.inputs = {}
-        pass
+        # try:
+        #     action = self.action
+        #     if self.action:
+        #         jsonschema.validate(instance=self.inputs, schema=action.input_schema)
+        # except (jsonschema.exceptions.ValidationError, Action.DoesNotExist) as e:
+        #     self.inputs = {}
+        # pass
 
     def execute_action(self, inputs: Dict[str, Any], config: Dict[str, Any]) -> Any:
         """
