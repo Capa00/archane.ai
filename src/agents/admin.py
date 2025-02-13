@@ -29,9 +29,9 @@ class AgentAdminForm(forms.ModelForm):
             instance.modules.set(self.cleaned_data['modules'])  # Aggiorna i moduli associati
         return instance
 
-class ModuleInline(admin.StackedInline):
-    model = Module.agents.through
-    extra = 0
+# class ModuleInline(admin.StackedInline):
+#     model = Module.agents.through
+#     extra = 0
 
 class AgentAdmin(admin.ModelAdmin):
     list_display = ("name",)
@@ -39,6 +39,6 @@ class AgentAdmin(admin.ModelAdmin):
     list_filter = ("name",)
 
     form = AgentAdminForm
-    inlines = [ModuleInline]
+    # inlines = [ModuleInline]
 
 admin.site.register(Agent, AgentAdmin)

@@ -35,7 +35,7 @@ class Action(models.Model):
 
     def _update_schema_if_none(self, field_name):
         if not getattr(self, field_name):
-            default_schema = getattr(ACTION_REGISTRY[self.funcname], f"DEFAULT_{field_name.upper()}", False)
+            default_schema = getattr(ACTION_REGISTRY[self.funcname], field_name.upper(), False)
             if default_schema:
                 setattr(self, field_name, default_schema)
 
@@ -63,8 +63,8 @@ class ModuleAction(models.Model):
     Collega un modulo a una specifica azione (comando),
     permettendo di incapsulare il comando in un contesto specifico.
     """
-    module: Module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name="module_actions")
-    action: Action = models.ForeignKey(Action, on_delete=models.CASCADE, related_name="module_actions")
+    module: Module = models.ForeignKey(Module, on_delete=models.SET_NULL, related_name="module_actions", null=True)
+    action: Action = models.ForeignKey(Action, on_delete=models.SET_NULL, related_name="module_actions", null=True)
     configs: dict = models.JSONField(_("Config"), default=dict, null=True, blank=True)
     inputs: dict = models.JSONField(_("Input"), default=dict, null=True, blank=True)
 
@@ -76,7 +76,9 @@ class ModuleAction(models.Model):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         try:
-            jsonschema.validate(instance=self.inputs, schema=self.action.input_schema)
+            action = self.action
+            if self.action:
+                jsonschema.validate(instance=self.inputs, schema=action.input_schema)
         except (jsonschema.exceptions.ValidationError, Action.DoesNotExist) as e:
             self.inputs = {}
         pass

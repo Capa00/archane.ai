@@ -33,7 +33,7 @@ class HelloWorldAction:
 
 @register_action("print")
 class PrintAction:
-    DEFAULT_INPUT_SCHEMA = {
+    INPUT_SCHEMA = {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "type": "array",
         "items": {
@@ -41,7 +41,7 @@ class PrintAction:
         }
     }
 
-    DEFAULT_OUTPUT_SCHEMA = {
+    OUTPUT_SCHEMA = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
@@ -54,7 +54,7 @@ class PrintAction:
         "additionalProperties": False,
     }
 
-    DEFAULT_CONFIG_SCHEMA = {
+    CONFIG_SCHEMA = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "string"
     }
