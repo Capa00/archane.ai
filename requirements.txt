@@ -7,3 +7,4 @@ tiktoken>=0.8.0
 pillow>=11.1.0
 django-jsonform>=2.23.2
 django-json-widget>=2.0.1
+jsonschema>=4.23.0
