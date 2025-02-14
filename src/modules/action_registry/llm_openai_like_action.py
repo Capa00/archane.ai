@@ -6,6 +6,7 @@ from mdeditor.fields import MDTextFormField
 from openai import OpenAI
 
 from modules.action_registry import register_action, ActionFunction
+from utils.openai_messages import ChatMessage
 
 
 @register_action("llm_openai_like")
@@ -30,15 +31,16 @@ class LLMOpenAILikeAction(ActionFunction):
     def get_input_form(self):
         return LLMOpenAILikeActionInputForm
 
-    def __call__(self, inputs, config):
+    def __call__(self, module_action, inputs, config):
         api_key = config.get('api_key') or os.environ.get("OPENAI_API_KEY")
         if config['base_url']:
             client = OpenAI(base_url=config['base_url'], api_key=api_key)
         else:
             client = OpenAI(api_key=api_key)
-
-        response = client.chat.completions.create(**config)
-        return {"output": " ".join(inputs['input'])}
+        system_prompt = ChatMessage(role=ChatMessage.Roles.SYSTEM, model='gpt-4o')
+        system_prompt.add_text(config['system_prompt'])
+        response = client.chat.completions.create(**config['data'], messages=[system_prompt.get_message()])
+        return {"response": response.choices[0].message.content}
 
 
 class LLMOpenAILikeActionInputForm(forms.Form):
@@ -256,5 +258,7 @@ class LLMOpenAILikeActionConfigForm(forms.Form):
     }
 
     system_prompt = MDTextFormField(required=False)
+    base_url = forms.URLField()
+    api_key = forms.CharField(max_length=255)
     prompt_context = forms.CharField(required=False)
     data = JSONFormField(schema=DATA_SCHEMA, required=False)

@@ -18,8 +18,9 @@ class ModuleActionInlineForModule(admin.StackedInline):
 
 
 @admin.register(Module)
-class ModuleAdminNestedInline(JSONWidgetAdminMixin, admin.ModelAdmin):
+class ModuleAdmin(JSONWidgetAdminMixin, admin.ModelAdmin):
     list_display = ('name', 'created_at')
+    list_filter = ('agents',)
     search_fields = ('name',)
     ordering = ('name',)
     form = ModuleAdminForm

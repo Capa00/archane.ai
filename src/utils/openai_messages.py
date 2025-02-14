@@ -9,7 +9,7 @@ import tiktoken
 from tiktoken import Encoding
 
 
-class Message:
+class ChatMessage:
     class Roles(Enum):
         SYSTEM = "system"
         USER = "user"

@@ -12,10 +12,10 @@ logger = logging.getLogger(__name__)
 
 
 class Module(models.Model):
-    agents = models.ManyToManyField('agents.Agent', related_name="modules", blank=True)
     name: str = models.CharField(_("Module Name"), max_length=255, unique=True)
     description: str = models.TextField(_("Description"), blank=True, null=True)
     created_at: timezone.datetime = models.DateTimeField(auto_now_add=True)
+    agents = models.ManyToManyField('agents.Agent', related_name="modules", blank=True)
 
     def __str__(self) -> str:
         return self.name
@@ -51,10 +51,8 @@ class Action(models.Model):
     def __str__(self):
         return f"{self.name} ({self.funcname})"
 
-    def execute(self, inputs: Dict[str, Any], config: Dict[str, Any]) -> Any:
-        jsonschema.validate(instance=inputs, schema=self.input_schema)
-        jsonschema.validate(instance=config, schema=self.config_schema)
-        return ACTION_REGISTRY[self.funcname]()(inputs, config)
+    def execute(self, module_action, inputs: Dict[str, Any], config: Dict[str, Any]) -> Any:
+        return ACTION_REGISTRY[self.funcname]()(module_action, inputs, config)
 
 
 class ModuleAction(models.Model):
@@ -64,7 +62,7 @@ class ModuleAction(models.Model):
     inputs: dict = models.JSONField(_("Input"), default=dict, null=True, blank=True)
 
     def execute_action(self, inputs: Dict[str, Any], config: Dict[str, Any]) -> Any:
-        return self.action.execute(inputs, config)
+        return self.action.execute(self, inputs, config)
 
     def execute(self, inputs, config, user=None) -> Any:
         with transaction.atomic():
@@ -102,9 +100,9 @@ class Execution(models.Model):
     started_at: timezone.datetime = models.DateTimeField(null=True, blank=True)
     finished_at: timezone.datetime = models.DateTimeField(null=True, blank=True)
 
+    output: dict = models.JSONField(_("Output"), null=True, blank=True)
     inputs: dict = models.JSONField(_("Inputs"), null=True, blank=True)
     configs: dict = models.JSONField(_("Config"), default=dict, null=True, blank=True)
-    output: dict = models.JSONField(_("Output"), null=True, blank=True)
 
     def set_created_by(self, user):
         self.created_by = user
