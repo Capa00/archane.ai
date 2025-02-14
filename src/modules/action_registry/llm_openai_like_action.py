@@ -7,24 +7,6 @@ from modules.action_registry import register_action, ActionFunction
 
 @register_action("llm_openai_like")
 class LLMOpenAILikeAction(ActionFunction):
-    INPUT_SCHEMA = {
-        "$schema": "http://json-schema.org/draft-07/schema#",
-        "type": "object",
-        "properties": {
-            "system_prompt": {
-                "type": "string"
-            },
-            "data": {
-                "type": "array",
-                "items": {
-                    "type": "string"
-                }
-            }
-        },
-        "required": ["system_prompt", "data"],
-        "additionalProperties": False
-    }
-
     OUTPUT_SCHEMA = {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "type": "object",
@@ -39,30 +21,19 @@ class LLMOpenAILikeAction(ActionFunction):
         "required": ["output", "token"]
     }
 
-    CONFIG_SCHEMA = {
-        "$schema": "http://json-schema.org/draft-07/schema#",
-        "type": "object",
-        "properties": {
-            "system_prompt": {
-                "type": "string"
-            },
-            "data": {
-                "type": "array",
-                "items": {
-                    "type": "string"
-                }
-            }
-        },
-        "required": ["system_prompt", "data"],
-        "additionalProperties": False
-    }
-
     def get_config_form(self):
         return LLMOpenAILikeActionConfigForm
 
+    def get_input_form(self):
+        return LLMOpenAILikeActionInputForm
+
     def __call__(self, inputs, config):
+
         return {"output": " ".join(inputs['input'])}
 
+
+class LLMOpenAILikeActionInputForm(forms.Form):
+    prompt_context = forms.CharField(widget=forms.Textarea, required=False)
 
 class LLMOpenAILikeActionConfigForm(forms.Form):
     DATA_SCHEMA = {
@@ -79,5 +50,5 @@ class LLMOpenAILikeActionConfigForm(forms.Form):
         "required": ["data"],
         "additionalProperties": False
     }
-    prompt = MDTextFormField()
-    data = JSONFormField(schema=DATA_SCHEMA)
+    system_prompt = MDTextFormField(required=False)
+    data = JSONFormField(schema=DATA_SCHEMA, required=False)

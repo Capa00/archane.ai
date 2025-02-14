@@ -61,12 +61,7 @@ class ModuleAction(models.Model):
     module: Module = models.ForeignKey(Module, on_delete=models.SET_NULL, related_name="module_actions", null=True)
     action: Action = models.ForeignKey(Action, on_delete=models.SET_NULL, related_name="module_actions", null=True)
     configs: dict = models.JSONField(_("Config"), default=dict, null=True, blank=True)
-    #inputs: dict = models.JSONField(_("Input"), default=dict, null=True, blank=True)
-
-    order: int = models.PositiveIntegerField(
-        default=0,
-        help_text="Ordine di esecuzione del comando nel contesto del modulo"
-    )
+    inputs: dict = models.JSONField(_("Input"), default=dict, null=True, blank=True)
 
     def execute_action(self, inputs: Dict[str, Any], config: Dict[str, Any]) -> Any:
         return self.action.execute(inputs, config)

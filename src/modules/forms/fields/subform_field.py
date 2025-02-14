@@ -11,7 +11,6 @@ class SubFormField(forms.Field):
         self.subform = None
 
     def clean(self, value):
-        # Istanzia il subform con i dati ricevuti e verifica la validità
         self.subform = self.widget.form_class(value)
         if not self.subform.is_valid():
             raise forms.ValidationError(self.subform.errors)

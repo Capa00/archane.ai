@@ -6,6 +6,7 @@ from modules.models import ModuleAction
 
 class ModuleActionForm(forms.ModelForm):
     configs = SubFormField(form_class=forms.Form)
+    inputs = SubFormField(form_class=forms.Form)
 
     class Meta:
         model = ModuleAction
@@ -13,17 +14,18 @@ class ModuleActionForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and getattr(self.instance, 'action', None):
-            try:
-                action_function = get_action_function(self.instance.action.funcname)
-                action_instance = action_function() if action_function else None
-                if action_instance and hasattr(action_instance, 'get_config_form'):
-                    config_form_class = action_instance.get_config_form()
-                    self.fields['configs'] = SubFormField(form_class=config_form_class)
-                    #self.fields['configs'].widget = SubFormWidget(config_form_class)
-                else:
-                    self.fields['configs'].widget = SubFormWidget(forms.Form)
-            except Exception as e:
-                self.fields['configs'].widget = SubFormWidget(forms.Form)
-        else:
-            self.fields['configs'].widget = SubFormWidget(forms.Form)
+
+        default_widget = SubFormWidget(forms.Form)
+        self.fields['configs'].widget = default_widget
+        self.fields['inputs'].widget = default_widget
+
+        if not (self.instance and getattr(self.instance, 'action', None)):
+            return
+
+        action_function = get_action_function(self.instance.action.funcname)
+        if not action_function:
+            return
+
+        action_instance = action_function()
+        self.fields['configs'] = SubFormField(form_class=action_instance.get_config_form())
+        self.fields['inputs'] = SubFormField(form_class=action_instance.get_input_form())

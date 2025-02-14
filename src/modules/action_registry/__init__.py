@@ -34,16 +34,20 @@ class ActionFunction:
     OUTPUT_SCHEMA = {}
     CONFIG_SCHEMA = {}
 
-    # def get_input_form(self, *args, **kwargs):
-    #     return ActionFunctionForm()
-    #
-    # def get_output_form(self, *args, **kwargs):
-    #     return ActionFunctionForm()
-    #
     def get_config_form(self, *args, **kwargs):
         class ActionConfigForm(forms.Form):
             configs = JSONFormField(schema=self.CONFIG_SCHEMA)
         return ActionConfigForm
+
+    def get_input_form(self, *args, **kwargs):
+        class ActionInputForm(forms.Form):
+            inputs = JSONFormField(schema=self.INPUT_SCHEMA)
+        return ActionInputForm
+
+    def get_output_form(self, *args, **kwargs):
+        class ActionOutputForm(forms.Form):
+            output = JSONFormField(schema=self.OUTPUT_SCHEMA)
+        return ActionOutputForm
 
 
 package_name = __name__

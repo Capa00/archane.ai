@@ -14,7 +14,6 @@ class ModuleActionAdmin(JSONWidgetAdminMixin, admin.ModelAdmin):
     list_display = ('module', 'action')
     list_filter = ('module__name', 'action__funcname', 'action__name')
     search_fields = ('module', 'action')
-    ordering = ('module', 'order')
 
     def get_urls(self):
         urls = super().get_urls()
