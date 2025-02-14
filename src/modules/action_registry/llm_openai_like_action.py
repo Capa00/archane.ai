@@ -81,10 +81,3 @@ class LLMOpenAILikeActionConfigForm(forms.Form):
     }
     prompt = MDTextFormField()
     data = JSONFormField(schema=DATA_SCHEMA)
-
-    def is_valid(self):
-        return super().is_valid()
-
-    def clean(self):
-        cleaned_data = super().clean()
-        return cleaned_data

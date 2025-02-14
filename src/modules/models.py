@@ -58,10 +58,6 @@ class Action(models.Model):
 
 
 class ModuleAction(models.Model):
-    """
-    Collega un modulo a una specifica azione (comando),
-    permettendo di incapsulare il comando in un contesto specifico.
-    """
     module: Module = models.ForeignKey(Module, on_delete=models.SET_NULL, related_name="module_actions", null=True)
     action: Action = models.ForeignKey(Action, on_delete=models.SET_NULL, related_name="module_actions", null=True)
     configs: dict = models.JSONField(_("Config"), default=dict, null=True, blank=True)
@@ -72,28 +68,10 @@ class ModuleAction(models.Model):
         help_text="Ordine di esecuzione del comando nel contesto del modulo"
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # try:
-        #     action = self.action
-        #     if self.action:
-        #         jsonschema.validate(instance=self.inputs, schema=action.input_schema)
-        # except (jsonschema.exceptions.ValidationError, Action.DoesNotExist) as e:
-        #     self.inputs = {}
-        # pass
-
     def execute_action(self, inputs: Dict[str, Any], config: Dict[str, Any]) -> Any:
-        """
-        Esegue il comando incapsulato nell'azione.
-        Qui potresti aggiungere logiche specifiche relative al contesto.
-        """
         return self.action.execute(inputs, config)
 
     def execute(self, inputs, config, user=None) -> Any:
-        """
-        Esegue il comando associato alla ModuleAction,
-        registrando gli orari di inizio e fine e salvando l'output.
-        """
         with transaction.atomic():
             self.inputs = inputs
             self.config = config
@@ -114,10 +92,6 @@ class ModuleAction(models.Model):
             execution.save()
 
             return execution
-
-
-    def save(self, *args, **kwargs):
-        return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"{self.module} / {self.action}"
