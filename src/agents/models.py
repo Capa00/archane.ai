@@ -1,7 +1,6 @@
-from django.db import models
+from django.db import models, transaction
 from django_jsonform.models.fields import JSONField
 
-# Create your models here.
 class Agent(models.Model):
     SETTINGS_SCHEMA = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -140,6 +139,18 @@ class Agent(models.Model):
         for module in self.modules.all():
             state[module.name] = module.output
         return state
+
+    def duplicate(self) -> "Agent":
+        with transaction.atomic():
+            dup_agent = Agent.objects.create(
+                name=f"{self.name} (copy)",
+                settings = self.settings,
+            )
+            for module in self.modules.all():
+                dup_module = module.duplicate()
+                dup_module.agents.clear()
+                dup_module.agents.add(dup_agent)
+            return dup_agent
 
     def __str__(self):
         return f"Agent - {self.name}"

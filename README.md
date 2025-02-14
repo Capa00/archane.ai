@@ -63,40 +63,45 @@ This guide will walk you through setting up the Archane.ai project locally using
    http://localhost:8000
    ```
 
-5. **Development Mode**
-
-   For development, you can use the `dev-docker-compose.yml` file to start only the PostgreSQL database:
-
+### Development Mode
+1. For development, you can use the `dev-docker-compose.yml` file to start only the PostgreSQL database:
    ```bash
    docker-compose -f dev-docker-compose.yml up
    ```
+2. Run Migrations Manually
+  ```bash
+    cd src
+    ./manage.py migrate
+  ```
 
-   Then, run the Django development server locally:
+3. Create a Superuser
+
+  ```bash
+    ./manage.py createsuperuser
+  ```
+
+4. Then, run the Django development server locally:
 
    ```bash
-   python manage.py runserver
+   ./manage.py runserver
    ```
 
-### Additional Commands
+5. **Access the Application**
 
-- **Run Migrations Manually**
+   Once the containers are up and running, you can access the Django application at:
 
-  ```bash
-  docker-compose exec web python manage.py migrate
-  ```
-
-- **Create a Superuser**
-
-  ```bash
-  docker-compose exec web python manage.py createsuperuser
-  ```
-
-- **Stop the Containers**
-
-  ```bash
-   docker-compose down
+   ```bash
+   http://localhost:8000
    ```
+### Stop the Containers
 
+  ```bash
+    docker-compose down
+   ```
+or in development mode
+   ```bash
+    docker-compose -f dev-docker-compose.yml  down
+   ```
 ### Troubleshooting
 
 - Ensure that the environment variables are correctly set in the `.env` files.

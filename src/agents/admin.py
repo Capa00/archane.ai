@@ -1,9 +1,15 @@
 from django import forms
-from django.contrib import admin
+from django.contrib import admin, messages
 
 from agents.models import Agent
 from modules.models import Module
 
+
+@admin.action(description="Duplica gli agent selezionati")
+def duplicate_agent(modeladmin, request, queryset):
+    for agent in queryset:
+        agent.duplicate()
+    messages.success(request, "Gli agent sono stati duplicati con successo!")
 
 class AgentAdminForm(forms.ModelForm):
     modules = forms.ModelMultipleChoiceField(
@@ -34,6 +40,7 @@ class AgentAdminForm(forms.ModelForm):
 #     extra = 0
 
 class AgentAdmin(admin.ModelAdmin):
+    actions = [duplicate_agent]
     list_display = ("name",)
     search_fields = ("name",)
     list_filter = ("name",)

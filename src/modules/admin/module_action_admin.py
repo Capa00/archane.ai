@@ -8,11 +8,19 @@ from modules.forms.module_action_admin_form import ModuleActionForm
 from modules.models import ModuleAction
 
 
+@admin.action(description="Duplica i ModuleAction selezionati")
+def duplicate_moduleaction(modeladmin, request, queryset):
+    for agent in queryset:
+        agent.duplicate()
+    messages.success(request, "I ModuleAction sono stati duplicati con successo!")
+
+
 @admin.register(ModuleAction)
 class ModuleActionAdmin(JSONWidgetAdminMixin, admin.ModelAdmin):
+    actions = [duplicate_moduleaction]
     form = ModuleActionForm
-    list_display = ('module', 'action')
-    list_filter = ('module__name', 'action__funcname', 'action__name')
+    list_display = ('action', 'module')
+    list_filter = ('module', 'action__funcname', 'action__name')
     search_fields = ('module', 'action')
 
     def get_urls(self):
