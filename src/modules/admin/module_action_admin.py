@@ -3,9 +3,7 @@ from django.http import HttpResponseRedirect
 from django.urls import path, reverse
 from django.utils.translation import gettext_lazy as _
 
-from modules.admin import JSONWidgetAdminMixin
-from modules.admin.mixins import SchemaBasedAdminMixin, ExternalSchemaBasedAdminMixin
-from modules.forms.module_action_admin_form import ModuleActionForm
+from modules.admin.mixins import ExternalSchemaBasedAdminMixin
 from modules.models import ModuleAction
 
 
