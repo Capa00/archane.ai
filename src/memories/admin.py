@@ -1,10 +1,9 @@
 from django.contrib import admin
 
-from modules.admin import JSONWidgetAdminMixin
-from .forms.admin import MemoryAdminForm
+from modules.admin.mixins import SchemaBasedAdminMixin
 from .models import Memory
 
-class MemoryAdmin(JSONWidgetAdminMixin, admin.ModelAdmin):
-    form = MemoryAdminForm
+class MemoryAdmin(SchemaBasedAdminMixin, admin.ModelAdmin):
+    schemas_mapping = {"schema": "data"}
 
 admin.site.register(Memory, MemoryAdmin)
