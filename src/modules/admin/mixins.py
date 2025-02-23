@@ -79,3 +79,22 @@ class SchemaBasedAdminMixin:
             pass
         SchemaBasedForm.schemas_mapping = self.schemas_mapping
         return SchemaBasedForm
+
+    def get_fieldsets(self, request, obj=None):
+        # Se l'admin non ha definito fieldsets esplicitamente, creiamo una suddivisione automatica:
+        all_fields = self.get_fields(request, obj)
+        # Costruiamo la lista dei campi legati agli schema
+        schema_fields = []
+        for schema_field, data_field in self.schemas_mapping.items():
+            schema_fields.append(schema_field)
+        # Rimuovo eventuali duplicati
+        schema_fields = list(dict.fromkeys(schema_fields))
+        # I restanti campi vengono messi nel fieldset principale
+        main_fields = [f for f in all_fields if f not in schema_fields]
+
+        fieldsets = []
+        if main_fields:
+            fieldsets.append((_('Main Information'), {'fields': main_fields}))
+        if schema_fields:
+            fieldsets.append((_('Schemas'), {'classes': ('collapse',), 'fields': schema_fields}))
+        return fieldsets
