@@ -15,7 +15,7 @@ class ChatMessage:
         USER = "user"
         ASSISTANT = "assistant"
 
-    def __init__(self, role: Roles, model: str = None, encoding: Encoding = None):
+    def __init__(self, role: Roles, model: str = "gpt-4o", encoding: Encoding = None):
         self.role = role.value
         self.content = []
         self.encoding = encoding or tiktoken.encoding_for_model(model)

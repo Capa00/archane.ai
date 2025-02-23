@@ -4,6 +4,7 @@ from django.urls import path, reverse
 from django.utils.translation import gettext_lazy as _
 
 from modules.admin import JSONWidgetAdminMixin
+from modules.admin.mixins import SchemaBasedAdminMixin, ExternalSchemaBasedAdminMixin
 from modules.forms.module_action_admin_form import ModuleActionForm
 from modules.models import ModuleAction
 
@@ -16,12 +17,16 @@ def duplicate_moduleaction(modeladmin, request, queryset):
 
 
 @admin.register(ModuleAction)
-class ModuleActionAdmin(JSONWidgetAdminMixin, admin.ModelAdmin):
+class ModuleActionAdmin(ExternalSchemaBasedAdminMixin, admin.ModelAdmin):
     actions = [duplicate_moduleaction]
-    form = ModuleActionForm
     list_display = ('action', 'module')
     list_filter = ('module', 'action__funcname', 'action__name')
     search_fields = ('module', 'action')
+
+    external_schemas_mapping = {
+        "action.input_schema": "inputs",
+        "action.config_schema": "configs",
+    }
 
     def get_urls(self):
         urls = super().get_urls()
