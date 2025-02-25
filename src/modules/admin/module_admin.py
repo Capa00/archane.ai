@@ -1,6 +1,7 @@
 from django.contrib import admin, messages
 
-from modules.admin.mixins import JSONWidgetAdminMixin
+from modules.admin.mixins import JSONWidgetAdminMixin, ExternalSchemaBasedAdminMixin, \
+    ExternalSchemaBasedInlineAdminMixin
 from modules.forms.module_action_admin_form import ModuleActionForm
 from modules.forms.module_admin_form import ModuleAdminForm
 from modules.models import Module, ModuleAction
@@ -16,11 +17,16 @@ def duplicate_module(modeladmin, request, queryset):
     messages.success(request, "I Module sono stati duplicati con successo!")
 
 
-class ModuleActionInlineForModule(admin.StackedInline):
+class ModuleActionInlineForModule(ExternalSchemaBasedInlineAdminMixin, admin.StackedInline):
     model = ModuleAction
-    form = ModuleActionForm
+    #form = ModuleActionForm
     extra = 0
     show_change_link = True
+
+    external_schemas_mapping = {
+        "action.input_schema": "inputs",
+        "action.config_schema": "configs",
+    }
 
 
 @admin.register(Module)

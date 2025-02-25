@@ -176,3 +176,34 @@ class ExternalSchemaBasedAdminMixin:
             pass
         ExternalSchemaBasedForm.external_schemas_mapping = self.external_schemas_mapping
         return ExternalSchemaBasedForm
+
+
+class ExternalSchemaBasedInlineAdminMixin:
+    external_schemas_mapping = {}
+
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        OriginalForm = formset.form
+
+        class InlineForm(ExternalSchemaBasedFormMixin, OriginalForm):
+            pass
+
+        InlineForm.external_schemas_mapping = self.external_schemas_mapping
+        formset.form = InlineForm
+        return formset
+
+
+class SchemaBasedInlineAdminMixin:
+    schemas_mapping = {}
+
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        OriginalForm = formset.form
+
+        class InlineForm(SchemaBasedFormMixin, OriginalForm):
+            pass
+
+        InlineForm.schemas_mapping = self.schemas_mapping
+        formset.form = InlineForm
+        return formset
+
