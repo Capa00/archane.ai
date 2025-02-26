@@ -1,3 +1,4 @@
+import json
 import os
 
 from django import forms
@@ -26,6 +27,12 @@ class LLMOpenAILikeAction(ActionFunction):
         "required": ["output", "token"]
     }
 
+    def _get_prompt_context(self, inputs, config):
+        prompt_context_template = Template(json.dumps(config['prompt_context']))
+        prompt_context_context = Context(inputs)
+        prompt_context = prompt_context_template.render(prompt_context_context)
+        return json.loads(prompt_context)
+
     def __call__(self, module_action, inputs, config):
         api_key = config.get('api_key') or os.environ.get("OPENAI_API_KEY")
 
@@ -34,7 +41,7 @@ class LLMOpenAILikeAction(ActionFunction):
         else:
             client = OpenAI(api_key=api_key)
 
-        prompt_context = inputs['prompt_context']
+        prompt_context = self._get_prompt_context(inputs, config)
         template = config['system_prompt']
 
         template_obj = Template(template)

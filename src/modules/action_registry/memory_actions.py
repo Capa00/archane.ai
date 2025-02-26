@@ -1,3 +1,6 @@
+import json
+
+from django.template import Template, Context
 from jsonpath_ng import parse
 
 from memories.models import Memory
@@ -8,8 +11,8 @@ from modules.action_registry import register_action, ActionFunction
 class ReadMemoryAction(ActionFunction):
     def __call__(self, module_action, inputs, config):
         memory = Memory.objects.get(id=config['memory'])
-        if inputs:
-            jsonpath_expr = parse(inputs['json_path'])
+        if config:
+            jsonpath_expr = parse(config['json_path'])
             matches = jsonpath_expr.find(memory.data)
             if matches:
                 res = [match.value for match in matches]
@@ -21,6 +24,10 @@ class ReadMemoryAction(ActionFunction):
 class WriteMemoryAction(ActionFunction):
     def __call__(self, module_action, inputs, config):
         memory = Memory.objects.get(id=config['memory'])
-        if inputs:
-            memory.data.update(**inputs)
+        data = config['data']
+        if data:
+            data_template = Template(json.dumps(data))
+            data_context = Context(inputs)
+            data_dict = json.loads(data_template.render(data_context))
+            memory.data.update(**data_dict)
             memory.save()

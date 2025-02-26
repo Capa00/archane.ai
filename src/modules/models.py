@@ -36,6 +36,14 @@ class Module(models.Model):
                 mod_action.duplicate(new_module=dup_module)
             return dup_module
 
+    def execute(self, inputs: Dict[str, Any] = None, user: User = None):
+        outputs = []
+        with transaction.atomic():
+            for module_action in self.module_actions.all():
+                execution = module_action.execute(inputs, user)
+                outputs.append(execution.output)
+                inputs = {"input": execution.output, "outputs": outputs}
+
     def __str__(self) -> str:
         return self.name
 
@@ -58,18 +66,18 @@ class Action(models.Model):
     class Meta:
         unique_together = ("funcname", "name")
 
-    def _update_schema_if_none(self, field_name: str) -> None:
-        current_value = getattr(self, field_name)
-        if current_value is None:
-            default_schema = getattr(ACTION_REGISTRY.get(self.funcname, object()), field_name.upper(), None)
-            if default_schema is not None:
-                setattr(self, field_name, default_schema)
-
-    def save(self, *args, **kwargs):
-        # self._update_schema_if_none('input_schema')
-        # self._update_schema_if_none('output_schema')
-        # self._update_schema_if_none('config_schema')
-        return super().save(*args, **kwargs)
+    # def _update_schema_if_none(self, field_name: str) -> None:
+    #     current_value = getattr(self, field_name)
+    #     if current_value is None:
+    #         default_schema = getattr(ACTION_REGISTRY.get(self.funcname, object()), field_name.upper(), None)
+    #         if default_schema is not None:
+    #             setattr(self, field_name, default_schema)
+    #
+    # def save(self, *args, **kwargs):
+    #     # self._update_schema_if_none('input_schema')
+    #     # self._update_schema_if_none('output_schema')
+    #     # self._update_schema_if_none('config_schema')
+    #     return super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.name} ({self.funcname})"
@@ -90,14 +98,15 @@ class ModuleAction(models.Model):
     inputs: dict = models.JSONField(_("Input"), default=dict, null=True, blank=True)
     configs: dict = models.JSONField(_("Config"), default=dict, null=True, blank=True)
 
+    class Meta:
+        ordering = ['id']
 
     def execute_action(self, inputs: Dict[str, Any], configs: Dict[str, Any]) -> Any:
         return self.action.execute(self, inputs, configs)
 
-    def execute(self, inputs: Dict[str, Any], configs: Dict[str, Any], user: User = None) -> "Execution":
+    def execute(self, inputs: Dict[str, Any], user: User = None) -> "Execution":
         with transaction.atomic():
             self.inputs = inputs
-            self.configs = configs
             self.save()
 
             execution = Execution(

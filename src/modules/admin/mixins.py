@@ -145,7 +145,6 @@ class ExternalSchemaBasedFormMixin:
                     # Fallback: usiamo un JSONField con schema
                     self.fields[data_field] = forms.JSONField(
                         widget=JSONEditorWidget(),
-                        schema=schema_value,
                         label=self.fields.get(data_field, {}).label or _(data_field.capitalize()),
                         required=False
                     )

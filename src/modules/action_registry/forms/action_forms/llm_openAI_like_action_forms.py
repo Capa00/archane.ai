@@ -211,14 +211,14 @@ class LLMOpenAILikeActionConfigForm(forms.Form):
             #     "description": "Tempo massimo di attesa della risposta."
             # }
         },
-        "required": ["model"]
     }
 
+    prompt_context = forms.JSONField(widget=JSONEditorWidget(), required=False)
     system_prompt = MDTextFormField(required=False)
-    base_url = forms.URLField()
-    api_key = forms.CharField(max_length=255)
+    base_url = forms.URLField(required=False)
+    api_key = forms.CharField(max_length=255, required=False)
     data = JSONFormField(schema=DATA_SCHEMA, required=False)
 
 
 class LLMOpenAILikeActionInputForm(forms.Form):
-    prompt_context = forms.JSONField(widget=JSONEditorWidget())
+    ... # prompt_context = forms.JSONField(widget=JSONEditorWidget(), required=False)

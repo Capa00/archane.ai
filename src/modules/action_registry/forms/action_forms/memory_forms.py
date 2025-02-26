@@ -1,19 +1,22 @@
 from django import forms
+from django_json_widget.widgets import JSONEditorWidget
 
 from memories.models import Memory
 
 
-class WriteMemoryConfigForm(forms.Form):
-    memory = forms.ModelChoiceField(queryset=Memory.objects.all())
+class MemoryFormBase(forms.Form):
+    memory = forms.ModelChoiceField(queryset=Memory.objects.all(), required=False)
 
     def clean(self):
         cleaned_data = super().clean()
-        cleaned_data['memory'] = cleaned_data['memory'].id
+        memory = cleaned_data.get("memory")
+        if memory:
+            cleaned_data['memory'] = memory.id
         return cleaned_data
 
 
-class ReadMemoryConfigForm(WriteMemoryConfigForm):
-    ...
+class WriteMemoryConfigForm(MemoryFormBase):
+    data = forms.JSONField(widget=JSONEditorWidget, required=False)
 
-class ReadMemoryInputForm(forms.Form):
-    json_path = forms.CharField(max_length=255)
+class ReadMemoryConfigForm(MemoryFormBase):
+    json_path = forms.CharField(max_length=255, required=False)
