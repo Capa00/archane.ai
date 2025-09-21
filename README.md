@@ -1,6 +1,15 @@
 
 # Archane.ai
 
+# Project Description  
+
+This repository contains an experimental prototype inspired by the **PIANO (Parallel Information Aggregation via Neural Orchestration)** architecture, proposed in *[Project Sid: Many-agent simulations toward AI civilization](https://arxiv.org/pdf/2411.00114)*.  
+
+The goal is to explore how **LLM-based autonomous agents** can:  
+- **Think and act in parallel** through concurrent modules (cognition, planning, memory, social interaction, skill execution).  
+- Maintain **coherence** across multiple output streams (actions, language, behaviors) via a centralized *Cognitive Controller*.  
+
+
 ## Getting Started
 
 This guide will walk you through setting up the Archane.ai project locally using Docker and Django.
