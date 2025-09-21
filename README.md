@@ -1,7 +1,7 @@
 
 # Archane.ai
 
-# Project Description  
+## Project Description  
 
 This repository contains an experimental prototype inspired by the **PIANO (Parallel Information Aggregation via Neural Orchestration)** architecture, proposed in *[Project Sid: Many-agent simulations toward AI civilization](https://arxiv.org/pdf/2411.00114)*.  
 
